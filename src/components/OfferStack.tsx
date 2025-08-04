@@ -80,7 +80,7 @@ const OfferStack = () => {
       ref={sectionRef}
       className="relative py-16 md:py-24 px-4 overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        backgroundColor: '#A3B78A',
         minHeight: '100vh'
       }}
     >
