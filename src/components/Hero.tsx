@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight, CheckCircle } from 'lucide-react';
-import Silk from './Silk'; // make sure path is correct
+import Silk from './Silk';
 
 const Hero = () => {
   return (
