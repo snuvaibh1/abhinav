@@ -10,7 +10,7 @@ const Hero = () => {
         <Silk
           speed={5}
           scale={1}
-          color="#00e19e" // tweak this to match your silk texture
+          color="#7B7481"
           noiseIntensity={1.5}
           rotation={0}
         />
