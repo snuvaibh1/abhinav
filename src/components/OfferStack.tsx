@@ -262,7 +262,7 @@ const OfferStack = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Button Content */}
-            <div className="relative z-10 flex items-center gap-3 text-white transition-colors duration-300">
+            <div className="relative z-10 flex items-center gap-3 text-black transition-colors duration-300">
               <span className="text-2xl animate-bounce">🎉</span>
               YES! I'm Ready to Heal – Enroll Now
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
