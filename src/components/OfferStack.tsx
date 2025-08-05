@@ -251,13 +251,13 @@ const OfferStack = () => {
         
         {/* CTA Button with Advanced Animations */}
         <div className="text-center">
-          <button 
-            className="group relative inline-flex items-center gap-3 px-8 py-4 md:px-12 md:py-6 text-lg md:text-xl font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-500 overflow-hidden"
-            style={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              fontFamily: 'Montserrat, sans-serif'
-            }}
-          >
+<button 
+  className="group relative inline-flex items-center gap-3 px-8 py-4 md:px-12 md:py-6 text-lg md:text-xl font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-500 overflow-hidden bg-white text-black"
+  style={{
+    fontFamily: 'Montserrat, sans-serif'
+  }}
+>
+
             {/* Button Background Animation */}
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
