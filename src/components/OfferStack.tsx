@@ -144,9 +144,10 @@ if (entry.isIntersecting && !isVisible) {
                     ? 'opacity-100 translate-y-0 scale-100'
                     : 'opacity-0 translate-y-8 scale-95'
               }`}
-              style={{ 
-                transitionDelay: prefersReducedMotion ? '0ms' : `${index * 100}ms` 
-              }}
+style={{
+  willChange: 'opacity, transform',
+  transitionDelay: prefersReducedMotion ? '0ms' : `${index * 100}ms`
+}}
             >
               {/* Glassmorphism Card */}
               <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:bg-white/15 cursor-pointer overflow-hidden">
