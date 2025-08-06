@@ -51,15 +51,15 @@ const OfferStack = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            // Stagger the reveal of items
-            offerings.forEach((_, index) => {
-              setTimeout(() => {
-                setVisibleItems(prev => [...prev, index]);
-              }, index * 200); // 200ms delay between each item
-            });
-          }
+if (entry.isIntersecting && !isVisible) {
+  setIsVisible(true);
+  offerings.forEach((_, index) => {
+    setTimeout(() => {
+      setVisibleItems(prev => [...prev, index]);
+    }, index * 200);
+  });
+  observer.unobserve(entry.target); // stop observing after first trigger
+}
         });
       },
       { threshold: 0.2, rootMargin: '-50px' }
