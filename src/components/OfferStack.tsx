@@ -90,10 +90,7 @@ const OfferStack = () => {
       <div className="max-w-6xl mx-auto text-center">
         <h2
           className="text-3xl md:text-5xl font-bold mb-16"
-          style={{
-            fontFamily: 'Playfair Display, serif',
-            color: '#2B3A55'
-          }}
+          style={{ fontFamily: 'Playfair Display, serif', color: '#2B3A55' }}
         >
           What You’ll <span style={{ color: '#9EB384' }}>Experience Inside</span>
         </h2>
@@ -122,19 +119,13 @@ const OfferStack = () => {
                 <div className="text-left">
                   <h3
                     className="text-xl font-bold mb-2"
-                    style={{
-                      fontFamily: 'Playfair Display, serif',
-                      color: '#2B3A55'
-                    }}
+                    style={{ fontFamily: 'Playfair Display, serif', color: '#2B3A55' }}
                   >
                     {item.title}
                   </h3>
                   <p
                     className="text-base leading-relaxed"
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif',
-                      color: '#2B3A55'
-                    }}
+                    style={{ fontFamily: 'Montserrat, sans-serif', color: '#2B3A55' }}
                   >
                     {item.description}
                   </p>
