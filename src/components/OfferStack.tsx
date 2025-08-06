@@ -81,7 +81,7 @@ if (entry.isIntersecting && !isVisible) {
       className="relative py-16 md:py-24 px-4 overflow-hidden"
       style={{
         backgroundColor: '#A3B78A',
-        minHeight: '100vh'
+        minHeight: 'fit-content'
       }}
     >
       {/* Animated Background Elements */}
