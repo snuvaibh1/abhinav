@@ -57,22 +57,22 @@ const ScrollStack = ({
   }, []);
 
   const updateCardTransforms = useCallback(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller || !cardsRef.current.length || isUpdatingRef.current) return;
+    if (!cardsRef.current.length || isUpdatingRef.current) return;
 
     isUpdatingRef.current = true;
 
-    const scrollTop = scroller.scrollTop;
-    const containerHeight = scroller.clientHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const containerHeight = window.innerHeight;
     const stackPositionPx = parsePercentage(stackPosition, containerHeight);
     const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
-    const endElement = scroller.querySelector('.scroll-stack-end') as HTMLElement;
-    const endElementTop = endElement ? endElement.offsetTop : 0;
+    const endElement = document.querySelector('.scroll-stack-end') as HTMLElement;
+    const endElementTop = endElement ? endElement.getBoundingClientRect().top + scrollTop : 0;
 
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
 
-      const cardTop = card.offsetTop;
+      const cardRect = card.getBoundingClientRect();
+      const cardTop = cardRect.top + scrollTop;
       const triggerStart = cardTop - stackPositionPx - (itemStackDistance * i);
       const triggerEnd = cardTop - scaleEndPositionPx;
       const pinStart = cardTop - stackPositionPx - (itemStackDistance * i);
@@ -87,7 +87,8 @@ const ScrollStack = ({
       if (blurAmount) {
         let topCardIndex = 0;
         for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardTop = cardsRef.current[j].offsetTop;
+          const jCardRect = cardsRef.current[j].getBoundingClientRect();
+          const jCardTop = jCardRect.top + scrollTop;
           const jTriggerStart = jCardTop - stackPositionPx - (itemStackDistance * j);
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j;
@@ -166,9 +167,10 @@ const ScrollStack = ({
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
+    // Use window as the scroll container instead of the scroller element
     const lenis = new Lenis({
-      wrapper: scroller,
-      content: scroller.querySelector('.scroll-stack-inner') as HTMLElement,
+      wrapper: window,
+      content: document.documentElement,
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
@@ -252,6 +254,7 @@ const ScrollStack = ({
     <div
       className={`scroll-stack-scroller ${className}`.trim()}
       ref={scrollerRef}
+      style={{ height: 'auto', minHeight: 'auto' }}
     >
       <div className="scroll-stack-inner">
         {children}

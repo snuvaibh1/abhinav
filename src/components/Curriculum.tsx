@@ -42,7 +42,7 @@ const Curriculum = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 px-4 min-h-screen">
+    <section className="py-16 md:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <h2 
           className="text-3xl md:text-5xl font-bold text-center mb-16"
@@ -57,60 +57,58 @@ const Curriculum = () => {
           </span>
         </h2>
         
-        <div className="h-screen">
-          <ScrollStack
-            itemDistance={120}
-            itemScale={0.05}
-            itemStackDistance={40}
-            stackPosition="25%"
-            scaleEndPosition="15%"
-            baseScale={0.9}
-            rotationAmount={2}
-            blurAmount={0.5}
-          >
-            {modules.map((module, index) => (
-              <ScrollStackItem key={index}>
-                <div className="flex flex-col md:flex-row items-start gap-6 p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
-                  <div className="flex items-center gap-4 mb-4 md:mb-0">
-                    <div 
-                      className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl"
-                      style={{ backgroundColor: '#9EB384' }}
-                    >
-                      {index + 1}
-                    </div>
-                    <div 
-                      className="flex-shrink-0"
-                      style={{ color: '#9EB384' }}
-                    >
-                      {module.icon}
-                    </div>
+        <ScrollStack
+          itemDistance={120}
+          itemScale={0.05}
+          itemStackDistance={40}
+          stackPosition="25%"
+          scaleEndPosition="15%"
+          baseScale={0.9}
+          rotationAmount={2}
+          blurAmount={0.5}
+        >
+          {modules.map((module, index) => (
+            <ScrollStackItem key={index}>
+              <div className="flex flex-col md:flex-row items-start gap-6 p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
+                <div className="flex items-center gap-4 mb-4 md:mb-0">
+                  <div 
+                    className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl"
+                    style={{ backgroundColor: '#9EB384' }}
+                  >
+                    {index + 1}
                   </div>
-                  
-                  <div className="flex-1">
-                    <h3 
-                      className="text-xl md:text-2xl font-bold mb-3"
-                      style={{ 
-                        fontFamily: 'Playfair Display, serif', 
-                        color: '#2B3A55' 
-                      }}
-                    >
-                      {module.title}
-                    </h3>
-                    <p 
-                      className="text-lg leading-relaxed"
-                      style={{ 
-                        fontFamily: 'Montserrat, sans-serif', 
-                        color: '#2B3A55' 
-                      }}
-                    >
-                      {module.description}
-                    </p>
+                  <div 
+                    className="flex-shrink-0"
+                    style={{ color: '#9EB384' }}
+                  >
+                    {module.icon}
                   </div>
                 </div>
-              </ScrollStackItem>
-            ))}
-          </ScrollStack>
-        </div>
+                
+                <div className="flex-1">
+                  <h3 
+                    className="text-xl md:text-2xl font-bold mb-3"
+                    style={{ 
+                      fontFamily: 'Playfair Display, serif', 
+                      color: '#2B3A55' 
+                    }}
+                  >
+                    {module.title}
+                  </h3>
+                  <p 
+                    className="text-lg leading-relaxed"
+                    style={{ 
+                      fontFamily: 'Montserrat, sans-serif', 
+                      color: '#2B3A55' 
+                    }}
+                  >
+                    {module.description}
+                  </p>
+                </div>
+              </div>
+            </ScrollStackItem>
+          ))}
+        </ScrollStack>
       </div>
     </section>
   );
