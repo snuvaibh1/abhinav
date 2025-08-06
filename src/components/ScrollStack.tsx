@@ -42,6 +42,7 @@ const ScrollStack = ({
   const cardsRef = useRef<HTMLElement[]>([]);
   const lastTransformsRef = useRef(new Map());
   const isUpdatingRef = useRef(false);
+  const sectionStartRef = useRef(0);
 
   const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
     if (scrollTop < start) return 0;
@@ -65,56 +66,70 @@ const ScrollStack = ({
     const containerHeight = window.innerHeight;
     const stackPositionPx = parsePercentage(stackPosition, containerHeight);
     const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
-    const endElement = document.querySelector('.scroll-stack-end') as HTMLElement;
-    const endElementTop = endElement ? endElement.getBoundingClientRect().top + scrollTop : 0;
+    
+    // Get section start position
+    const sectionElement = scrollerRef.current;
+    if (!sectionElement) {
+      isUpdatingRef.current = false;
+      return;
+    }
+    
+    const sectionRect = sectionElement.getBoundingClientRect();
+    const sectionTop = sectionRect.top + scrollTop;
+    sectionStartRef.current = sectionTop;
+
+    // Calculate when stacking should start (when section enters viewport)
+    const stackingStartPoint = sectionTop - containerHeight * 0.2; // Start when section is 20% into viewport
+    const endElement = sectionElement.querySelector('.scroll-stack-end') as HTMLElement;
+    const endElementTop = endElement ? endElement.getBoundingClientRect().top + scrollTop : sectionTop + sectionRect.height;
 
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
 
       const cardRect = card.getBoundingClientRect();
       const cardTop = cardRect.top + scrollTop;
-      const triggerStart = cardTop - stackPositionPx - (itemStackDistance * i);
-      const triggerEnd = cardTop - scaleEndPositionPx;
-      const pinStart = cardTop - stackPositionPx - (itemStackDistance * i);
-      const pinEnd = endElementTop - containerHeight / 2;
-
-      const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
+      
+      // Calculate stacking triggers relative to section start
+      const cardTriggerStart = stackingStartPoint + (i * itemDistance * 0.3); // Stagger card triggers
+      const cardTriggerEnd = endElementTop - containerHeight * 0.5;
+      
+      // Calculate scale progress
+      const scaleProgress = calculateProgress(scrollTop, cardTriggerStart, cardTriggerStart + containerHeight * 0.8);
       const targetScale = baseScale + (i * itemScale);
       const scale = 1 - scaleProgress * (1 - targetScale);
+      
+      // Calculate rotation
       const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
 
+      // Calculate blur for depth effect
       let blur = 0;
-      if (blurAmount) {
-        let topCardIndex = 0;
-        for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardRect = cardsRef.current[j].getBoundingClientRect();
-          const jCardTop = jCardRect.top + scrollTop;
-          const jTriggerStart = jCardTop - stackPositionPx - (itemStackDistance * j);
-          if (scrollTop >= jTriggerStart) {
-            topCardIndex = j;
-          }
-        }
-        
-        if (i < topCardIndex) {
-          const depthInStack = topCardIndex - i;
-          blur = Math.max(0, depthInStack * blurAmount);
-        }
+      if (blurAmount && scaleProgress > 0) {
+        blur = Math.min(blurAmount, scaleProgress * blurAmount);
       }
 
+      // Calculate stacking position
       let translateY = 0;
-      const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
+      let zIndex = cardsRef.current.length - i; // Higher z-index for cards that should be on top
       
-      if (isPinned) {
-        translateY = scrollTop - cardTop + stackPositionPx + (itemStackDistance * i);
-      } else if (scrollTop > pinEnd) {
-        translateY = pinEnd - cardTop + stackPositionPx + (itemStackDistance * i);
+      if (scrollTop >= cardTriggerStart && scrollTop <= cardTriggerEnd) {
+        // Card is in stacking phase
+        const stackProgress = calculateProgress(scrollTop, cardTriggerStart, cardTriggerEnd);
+        const stackOffset = stackPositionPx + (i * itemStackDistance);
+        translateY = scrollTop - cardTop + stackOffset;
+        zIndex = cardsRef.current.length + i; // Ensure stacked cards are on top
+      } else if (scrollTop > cardTriggerEnd) {
+        // Card is past stacking phase
+        const stackOffset = stackPositionPx + (i * itemStackDistance);
+        translateY = cardTriggerEnd - cardTop + stackOffset;
+        zIndex = cardsRef.current.length + i;
       }
 
       const newTransform = {
         translateY: Math.round(translateY * 100) / 100,
         scale: Math.round(scale * 1000) / 1000,
         rotation: Math.round(rotation * 100) / 100,
-        blur: Math.round(blur * 100) / 100
+        blur: Math.round(blur * 100) / 100,
+        zIndex
       };
 
       const lastTransform = lastTransformsRef.current.get(i);
@@ -122,7 +137,8 @@ const ScrollStack = ({
         Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
         Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
         Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(lastTransform.blur - newTransform.blur) > 0.1;
+        Math.abs(lastTransform.blur - newTransform.blur) > 0.1 ||
+        lastTransform.zIndex !== newTransform.zIndex;
 
       if (hasChanged) {
         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
@@ -130,16 +146,18 @@ const ScrollStack = ({
 
         card.style.transform = transform;
         card.style.filter = filter;
+        card.style.zIndex = newTransform.zIndex.toString();
         
         lastTransformsRef.current.set(i, newTransform);
       }
 
+      // Check if stacking is complete
       if (i === cardsRef.current.length - 1) {
-        const isInView = scrollTop >= pinStart && scrollTop <= pinEnd;
-        if (isInView && !stackCompletedRef.current) {
+        const isInStackingPhase = scrollTop >= cardTriggerStart && scrollTop <= cardTriggerEnd;
+        if (isInStackingPhase && !stackCompletedRef.current) {
           stackCompletedRef.current = true;
           onStackComplete?.();
-        } else if (!isInView && stackCompletedRef.current) {
+        } else if (!isInStackingPhase && stackCompletedRef.current) {
           stackCompletedRef.current = false;
         }
       }
@@ -147,6 +165,7 @@ const ScrollStack = ({
 
     isUpdatingRef.current = false;
   }, [
+    itemDistance,
     itemScale,
     itemStackDistance,
     stackPosition,
@@ -164,10 +183,7 @@ const ScrollStack = ({
   }, [updateCardTransforms]);
 
   const setupLenis = useCallback(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    // Use window as the scroll container instead of the scroller element
+    // Use window as the scroll container for smooth page scrolling
     const lenis = new Lenis({
       wrapper: window,
       content: document.documentElement,
@@ -206,23 +222,32 @@ const ScrollStack = ({
     cardsRef.current = cards;
     const transformsCache = lastTransformsRef.current;
 
+    // Initialize cards with proper styling
     cards.forEach((card, i) => {
+      // Set initial spacing between cards
       if (i < cards.length - 1) {
         card.style.marginBottom = `${itemDistance}px`;
       }
-      card.style.willChange = 'transform, filter';
+      
+      // Optimize for animations
+      card.style.willChange = 'transform, filter, z-index';
       card.style.transformOrigin = 'top center';
       card.style.backfaceVisibility = 'hidden';
       card.style.transform = 'translateZ(0)';
       card.style.webkitTransform = 'translateZ(0)';
       card.style.perspective = '1000px';
       card.style.webkitPerspective = '1000px';
+      card.style.position = 'relative';
+      card.style.zIndex = (cards.length - i).toString(); // Initial z-index
     });
 
+    // Setup smooth scrolling
     setupLenis();
 
+    // Initial transform calculation
     updateCardTransforms();
 
+    // Cleanup function
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -254,11 +279,10 @@ const ScrollStack = ({
     <div
       className={`scroll-stack-scroller ${className}`.trim()}
       ref={scrollerRef}
-      style={{ height: 'auto', minHeight: 'auto' }}
     >
       <div className="scroll-stack-inner">
         {children}
-        {/* Spacer so the last pin can release cleanly */}
+        {/* Spacer for smooth animation completion */}
         <div className="scroll-stack-end" />
       </div>
     </div>

@@ -42,7 +42,7 @@ const Curriculum = () => {
   ];
 
   return (
-    <section className="py-16 md:py-24 px-4">
+    <section className="py-16 md:py-24 px-4" style={{ minHeight: 'auto' }}>
       <div className="max-w-6xl mx-auto">
         <h2 
           className="text-3xl md:text-5xl font-bold text-center mb-16"
@@ -58,18 +58,18 @@ const Curriculum = () => {
         </h2>
         
         <ScrollStack
-          itemDistance={120}
-          itemScale={0.05}
-          itemStackDistance={40}
-          stackPosition="25%"
-          scaleEndPosition="15%"
-          baseScale={0.9}
-          rotationAmount={2}
-          blurAmount={0.5}
+          itemDistance={80}
+          itemScale={0.04}
+          itemStackDistance={25}
+          stackPosition="20%"
+          scaleEndPosition="10%"
+          baseScale={0.92}
+          rotationAmount={1.5}
+          blurAmount={0.3}
         >
           {modules.map((module, index) => (
             <ScrollStackItem key={index}>
-              <div className="flex flex-col md:flex-row items-start gap-6 p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
+              <div className="flex flex-col md:flex-row items-start gap-6 p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-4 md:mb-0">
                   <div 
                     className="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl"
